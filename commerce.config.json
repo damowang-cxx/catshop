@@ -1,0 +1,13 @@
+{
+  "features": {
+    "cart": true,
+    "customerAuth": true,
+    "wishlist": true,
+    "orders": true,
+    "search": true,
+    "productRecommendations": true,
+    "collections": true,
+    "menus": true,
+    "pages": true
+  }
+}
