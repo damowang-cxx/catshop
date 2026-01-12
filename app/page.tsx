@@ -1,8 +1,14 @@
+/**
+ * 首页组件
+ * 展示网站的主要内容和产品推荐
+ */
+
 import { Carousel } from "components/carousel";
 import { ThreeItemGrid } from "components/grid/three-items";
 import Footer from "components/layout/footer";
 import { HeroSection } from "components/home/hero-section";
 
+// 页面 SEO 元数据配置
 export const metadata = {
   description:
     "精选优质玩偶 - 每一只玩偶都值得被珍爱",
@@ -11,6 +17,10 @@ export const metadata = {
   },
 };
 
+/**
+ * 首页主组件
+ * 包含：英雄区域、精选推荐、更多商品轮播
+ */
 export default function HomePage() {
   return (
     <>

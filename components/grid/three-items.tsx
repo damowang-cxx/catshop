@@ -1,8 +1,20 @@
+/**
+ * 三产品网格组件
+ * 用于首页展示精选推荐产品，采用一大两小的布局
+ */
+
 import { GridTileImage } from "components/grid/tile";
 import { getCollectionProducts } from "lib/commerce";
 import type { Product } from "lib/types";
 import Link from "next/link";
 
+/**
+ * 单个产品网格项组件
+ * @param item - 产品对象
+ * @param size - 尺寸类型："full" 全宽或 "half" 半宽
+ * @param priority - 是否优先加载图片（用于 LCP 优化）
+ * @returns 产品网格项的 JSX
+ */
 function ThreeItemGridItem({
   item,
   size,
@@ -47,14 +59,22 @@ function ThreeItemGridItem({
   );
 }
 
+/**
+ * 三产品网格主组件
+ * 从隐藏的集合中获取首页推荐产品
+ * 注意：以 `hidden-*` 开头的集合不会在搜索页面显示
+ * @returns 三产品网格的 JSX
+ */
 export async function ThreeItemGrid() {
-  // Collections that start with `hidden-*` are hidden from the search page.
+  // 获取首页精选产品集合（隐藏集合，不在搜索页显示）
   const homepageItems = await getCollectionProducts({
     collection: "hidden-homepage-featured-items",
   });
 
+  // 如果产品数量不足 3 个，不显示此组件
   if (!homepageItems[0] || !homepageItems[1] || !homepageItems[2]) return null;
 
+  // 解构获取三个产品
   const [firstProduct, secondProduct, thirdProduct] = homepageItems;
 
   return (

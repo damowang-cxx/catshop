@@ -1,9 +1,21 @@
+/**
+ * 首页英雄区域组件
+ * 展示网站的主要宣传内容和行动按钮
+ * 注意：必须是客户端组件（"use client"），用于动画效果
+ */
+
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+/**
+ * 英雄区域主组件
+ * 包含淡入动画效果
+ * @returns 英雄区域的 JSX
+ */
 export function HeroSection() {
+  // 用于控制动画的显示状态（避免服务端渲染时的闪烁）
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

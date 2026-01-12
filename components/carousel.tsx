@@ -1,16 +1,28 @@
+/**
+ * 产品轮播组件
+ * 用于首页展示产品，支持无限滚动
+ * 注意：以 `hidden-*` 开头的集合不会在搜索页面显示
+ */
+
 import { getCollectionProducts } from "lib/commerce";
 import Link from "next/link";
 import { GridTileImage } from "./grid/tile";
 
+/**
+ * 产品轮播主组件
+ * 通过重复产品数组实现无缝循环滚动
+ * @returns 产品轮播的 JSX
+ */
 export async function Carousel() {
-  // Collections that start with `hidden-*` are hidden from the search page.
+  // 获取首页轮播产品集合（隐藏集合，不在搜索页显示）
   const products = await getCollectionProducts({
     collection: "hidden-homepage-carousel",
   });
 
+  // 如果没有产品，不显示轮播
   if (!products?.length) return null;
 
-  // Purposefully duplicating products to make the carousel loop and not run out of products on wide screens.
+  // 故意重复产品数组，使轮播能够无缝循环，在大屏幕上不会出现产品不足的情况
   const carouselProducts = [...products, ...products, ...products];
 
   return (

@@ -1,3 +1,8 @@
+/**
+ * 导航栏组件
+ * 包含网站 Logo、菜单、搜索框、购物车等主要导航元素
+ */
+
 import CartModal from "components/cart/modal";
 import LogoSquare from "components/logo-square";
 import { FeatureGate } from "components/features/feature-gate";
@@ -8,10 +13,18 @@ import { Suspense } from "react";
 import MobileMenu from "./mobile-menu";
 import Search, { SearchSkeleton } from "./search";
 
+// 从环境变量获取网站名称
 const { SITE_NAME } = process.env;
 
+/**
+ * 导航栏主组件
+ * 根据功能开关显示/隐藏相应功能
+ * @returns 导航栏的 JSX
+ */
 export async function Navbar() {
+  // 获取导航菜单
   const menu = await getMenu("next-js-frontend-header-menu");
+  // 获取功能开关配置
   const features = getCommerceFeatures();
 
   return (

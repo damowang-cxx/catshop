@@ -1,3 +1,8 @@
+/**
+ * 产品详情页
+ * 展示单个产品的详细信息，包括图片、描述、价格、变体选择等
+ */
+
 import { GridTileImage } from "components/grid/tile";
 import Footer from "components/layout/footer";
 import { Gallery } from "components/product/gallery";
@@ -10,6 +15,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+/**
+ * 生成产品页面的 SEO 元数据
+ * @param props - 包含产品 handle 的参数对象
+ * @returns 产品页面的元数据
+ */
 export async function generateMetadata(props: {
   params: Promise<{ handle: string }>;
 }): Promise<Metadata> {
@@ -18,7 +28,9 @@ export async function generateMetadata(props: {
 
   if (!product) return notFound();
 
+  // 提取产品主图信息
   const { url, width, height, altText: alt } = product.featuredImage || {};
+  // 检查产品是否应该被搜索引擎索引（排除隐藏标签的产品）
   const indexable = !product.tags.includes(HIDDEN_PRODUCT_TAG);
 
   return {
@@ -47,6 +59,11 @@ export async function generateMetadata(props: {
   };
 }
 
+/**
+ * 产品详情页主组件
+ * @param props - 包含产品 handle 的参数对象
+ * @returns 产品详情页的 JSX
+ */
 export default async function ProductPage(props: {
   params: Promise<{ handle: string }>;
 }) {
@@ -55,6 +72,7 @@ export default async function ProductPage(props: {
 
   if (!product) return notFound();
 
+  // 结构化数据（JSON-LD），用于 SEO 和搜索引擎理解产品信息
   const productJsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -110,9 +128,16 @@ export default async function ProductPage(props: {
   );
 }
 
+/**
+ * 相关产品推荐组件
+ * 显示与当前产品相关的其他产品
+ * @param id - 当前产品的 ID
+ * @returns 相关产品列表的 JSX
+ */
 async function RelatedProducts({ id }: { id: string }) {
   const relatedProducts = await getProductRecommendations(id);
 
+  // 如果没有相关产品，不显示此部分
   if (!relatedProducts.length) return null;
 
   return (

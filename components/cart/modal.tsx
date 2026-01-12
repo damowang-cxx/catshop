@@ -1,3 +1,9 @@
+/**
+ * 购物车模态框组件
+ * 显示购物车内容，支持商品增删改、结算等功能
+ * 注意：必须是客户端组件（"use client"）
+ */
+
 "use client";
 
 import clsx from "clsx";
@@ -18,13 +24,19 @@ import { DeleteItemButton } from "./delete-item-button";
 import { EditItemQuantityButton } from "./edit-item-quantity-button";
 import OpenCart from "./open-cart";
 
+// 商品搜索参数类型
 type MerchandiseSearchParams = {
   [key: string]: string;
 };
 
+/**
+ * 购物车模态框主组件
+ * @returns 购物车模态框的 JSX
+ */
 export default function CartModal() {
   const { cart, updateCartItem } = useCart();
   const [isOpen, setIsOpen] = useState(false);
+  // 用于跟踪购物车商品数量变化，自动打开购物车
   const quantityRef = useRef(cart?.totalQuantity);
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
@@ -232,6 +244,11 @@ export default function CartModal() {
   );
 }
 
+/**
+ * 关闭购物车按钮组件
+ * @param className - 可选的额外样式类名
+ * @returns 关闭按钮的 JSX
+ */
 function CloseCart({ className }: { className?: string }) {
   return (
     <div className="relative flex h-11 w-11 items-center justify-center rounded-md border border-stone-300 bg-khaki-light text-stone-900 transition-colors hover:bg-khaki">
@@ -245,6 +262,11 @@ function CloseCart({ className }: { className?: string }) {
   );
 }
 
+/**
+ * 结算按钮组件
+ * 显示加载状态，处理结算操作
+ * @returns 结算按钮的 JSX
+ */
 function CheckoutButton() {
   const { pending } = useFormStatus();
 

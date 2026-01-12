@@ -1,3 +1,8 @@
+/**
+ * 根布局组件
+ * 定义整个应用的全局布局结构，包括导航栏、购物车、功能开关等
+ */
+
 import { CartProvider } from "components/cart/cart-context";
 import { FeaturesProvider } from "components/features/features-provider";
 import { Navbar } from "components/layout/navbar";
@@ -9,8 +14,10 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import { baseUrl } from "lib/utils";
 
+// 从环境变量获取网站名称
 const { SITE_NAME } = process.env;
 
+// 全局 SEO 元数据配置
 export const metadata = {
   metadataBase: new URL(baseUrl),
   title: {
@@ -23,12 +30,17 @@ export const metadata = {
   },
 };
 
+/**
+ * 根布局组件
+ * @param children - 子页面内容
+ * @returns 包含全局布局的 HTML 结构
+ */
 export default async function RootLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  // Don't await the fetch, pass the Promise to the context provider
+  // 不等待数据获取，将 Promise 传递给上下文提供者（流式渲染优化）
   const cart = getCart();
   const features = getCommerceFeatures();
 

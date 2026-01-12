@@ -1,3 +1,8 @@
+/**
+ * 搜索页布局组件
+ * 提供搜索页面的三栏布局：分类导航、内容区域、排序筛选
+ */
+
 import Footer from "components/layout/footer";
 import Collections from "components/layout/search/collections";
 import FilterList from "components/layout/search/filter";
@@ -5,6 +10,11 @@ import { sorting } from "lib/constants";
 import ChildrenWrapper from "./children-wrapper";
 import { Suspense } from "react";
 
+/**
+ * 搜索页布局
+ * @param children - 子页面内容（通常是产品列表）
+ * @returns 包含侧边栏和主内容区域的布局
+ */
 export default function SearchLayout({
   children,
 }: {

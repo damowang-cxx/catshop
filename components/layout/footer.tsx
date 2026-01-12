@@ -1,3 +1,8 @@
+/**
+ * 页脚组件
+ * 显示网站 Logo、菜单链接、版权信息等
+ */
+
 import Link from "next/link";
 
 import FooterMenu from "components/layout/footer-menu";
@@ -5,14 +10,23 @@ import LogoSquare from "components/logo-square";
 import { getMenu } from "lib/commerce";
 import { Suspense } from "react";
 
+// 从环境变量获取公司名称和网站名称
 const { COMPANY_NAME, SITE_NAME } = process.env;
 
+/**
+ * 页脚主组件
+ * @returns 页脚的 JSX
+ */
 export default async function Footer() {
   const currentYear = new Date().getFullYear();
+  // 生成版权日期字符串
   const copyrightDate = 2023 + (currentYear > 2023 ? `-${currentYear}` : "");
+  // 加载状态的骨架屏样式
   const skeleton =
     "w-full h-6 animate-pulse rounded-sm bg-stone-200 dark:bg-stone-700";
+  // 获取页脚菜单
   const menu = await getMenu("next-js-frontend-footer-menu");
+  // 版权名称（优先使用公司名称）
   const copyrightName = COMPANY_NAME || SITE_NAME || "";
 
   return (
