@@ -1,40 +1,41 @@
 /**
- * 后台订单管理 API 路由
- * 对接后端 API，处理订单列表请求
+ * 订单管理 API 路由
+ * GET: 获取订单列表
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { adminApiClient } from "lib/api/admin-client";
+import { cookies } from "next/headers";
 
-/**
- * GET /api/admin/orders
- * 获取订单列表
- * 对接后端: GET /api/admin/orders
- */
+const backendUrl = process.env.CUSTOM_API_BASE_URL || "http://localhost:3001/api";
+
+async function getAuthHeaders() {
+  const cookieStore = await cookies();
+  const adminToken = cookieStore.get("admin_token");
+  
+  return {
+    "Content-Type": "application/json",
+    ...(adminToken ? { Authorization: `Bearer ${adminToken.value}` } : {}),
+  };
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const page = searchParams.get("page") || "1";
-    const limit = searchParams.get("limit") || "20";
-    const status = searchParams.get("status") || "";
+    const { searchParams } = new URL(request.url);
+    const query = searchParams.toString();
+    const url = query ? `${backendUrl}/orders?${query}` : `${backendUrl}/orders`;
 
-    const orders = await adminApiClient.get<any>("/orders", {
-      page,
-      limit,
-      status,
+    const response = await fetch(url, {
+      method: "GET",
+      headers: await getAuthHeaders(),
     });
 
-    return NextResponse.json(orders);
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
   } catch (error: any) {
     console.error("获取订单列表失败:", error);
     return NextResponse.json(
-      {
-        error: error.message || "获取订单列表失败",
-        // 开发模式：返回空数组
-        data: [],
-        total: 0,
-      },
-      { status: error.status || 500 }
+      { error: "获取订单列表失败" },
+      { status: 500 }
     );
   }
 }

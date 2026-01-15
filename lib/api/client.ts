@@ -111,24 +111,29 @@ class ApiClient {
     endpoint: string,
     params?: Record<string, string | number | boolean | undefined>
   ): Promise<T> {
-    const url = new URL(`${this.baseURL}${endpoint}`);
+    try {
+      const url = new URL(`${this.baseURL}${endpoint}`);
 
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          url.searchParams.append(key, String(value));
-        }
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            url.searchParams.append(key, String(value));
+          }
+        });
+      }
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: await this.buildHeaders(),
+        cache: "no-store", // 服务端组件默认不缓存
       });
+
+      const result = await this.handleResponse<T>(response);
+      return result.data;
+    } catch (error: any) {
+      // 重新抛出错误，让调用者处理
+      throw error;
     }
-
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: await this.buildHeaders(),
-      cache: "no-store", // 服务端组件默认不缓存
-    });
-
-    const result = await this.handleResponse<T>(response);
-    return result.data;
   }
 
   /**

@@ -1,50 +1,63 @@
 /**
- * 后台分类管理 API 路由
- * 对接后端 API，处理分类列表和创建请求
+ * 分类管理 API 路由
+ * GET: 获取分类列表
+ * POST: 创建新分类
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { adminApiClient } from "lib/api/admin-client";
+import { cookies } from "next/headers";
 
-/**
- * GET /api/admin/collections
- * 获取分类列表
- * 对接后端: GET /api/admin/collections
- */
+const backendUrl = process.env.CUSTOM_API_BASE_URL || "http://localhost:3001/api";
+
+async function getAuthHeaders() {
+  const cookieStore = await cookies();
+  const adminToken = cookieStore.get("admin_token");
+  
+  return {
+    "Content-Type": "application/json",
+    ...(adminToken ? { Authorization: `Bearer ${adminToken.value}` } : {}),
+  };
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const collections = await adminApiClient.get<any[]>("/collections");
+    const { searchParams } = new URL(request.url);
+    const query = searchParams.toString();
+    const url = query ? `${backendUrl}/collections?${query}` : `${backendUrl}/collections`;
 
-    return NextResponse.json(collections);
+    const response = await fetch(url, {
+      method: "GET",
+      headers: await getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
   } catch (error: any) {
     console.error("获取分类列表失败:", error);
     return NextResponse.json(
-      {
-        error: error.message || "获取分类列表失败",
-        // 开发模式：返回空数组
-        data: [],
-      },
-      { status: error.status || 500 }
+      { error: "获取分类列表失败" },
+      { status: 500 }
     );
   }
 }
 
-/**
- * POST /api/admin/collections
- * 创建分类
- * 对接后端: POST /api/admin/collections
- */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const collection = await adminApiClient.post<any>("/collections", body);
 
-    return NextResponse.json(collection, { status: 201 });
+    const response = await fetch(`${backendUrl}/collections`, {
+      method: "POST",
+      headers: await getAuthHeaders(),
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
   } catch (error: any) {
     console.error("创建分类失败:", error);
     return NextResponse.json(
-      { error: error.message || "创建分类失败" },
-      { status: error.status || 500 }
+      { error: "创建分类失败" },
+      { status: 500 }
     );
   }
 }

@@ -1,42 +1,55 @@
 /**
- * 获取当前管理员信息 API 路由
- * 对接后端 API: GET /api/admin/auth/me
+ * 获取当前管理员用户信息 API 路由
  */
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { adminApiClient } from "lib/api/admin-client";
 
-/**
- * GET /api/admin/me
- * 获取当前登录的管理员信息
- */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const adminToken = cookieStore.get("admin_token");
 
     if (!adminToken) {
-      return NextResponse.json({ error: "未登录" }, { status: 401 });
+      return NextResponse.json(
+        { error: "未登录" },
+        { status: 401 }
+      );
     }
 
-    // 尝试从后端 API 获取用户信息
+    // 尝试调用后端 API
+    const backendUrl = process.env.CUSTOM_API_BASE_URL || "http://localhost:3001/api";
+    
     try {
-      const user = await adminApiClient.get<any>("/auth/me");
-      return NextResponse.json({ user });
-    } catch (apiError) {
-      // 如果后端 API 不可用，返回临时用户信息（开发模式）
-      console.warn("后端 API 不可用，返回临时用户信息:", apiError);
-      return NextResponse.json({
-        user: {
+      const response = await fetch(`${backendUrl}/auth/me`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${adminToken.value}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return NextResponse.json(data.user || data.data?.user || data);
+      }
+    } catch (backendError) {
+      // 后端不可用时，返回临时用户信息（仅开发环境）
+      if (process.env.NODE_ENV === "development") {
+        return NextResponse.json({
           id: "1",
           email: "admin@example.com",
           name: "管理员",
-          role: "admin",
-        },
-      });
+        });
+      }
+
+      console.error("后端 API 调用失败:", backendError);
     }
-  } catch (error) {
+
+    return NextResponse.json(
+      { error: "获取用户信息失败" },
+      { status: 500 }
+    );
+  } catch (error: any) {
     console.error("获取用户信息错误:", error);
     return NextResponse.json(
       { error: "获取用户信息失败" },

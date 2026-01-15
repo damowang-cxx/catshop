@@ -305,7 +305,7 @@ class CustomProvider implements CommerceProvider {
   // 其他
   async getMenu(handle: string): Promise<Menu[]> {
     try {
-      return await this.fetch<Menu[]>(`/menus/${handle}`);
+      return await apiClient.get<Menu[]>(`/menus/${handle}`);
     } catch (error) {
       console.error("Failed to get menu:", error);
       return [];
@@ -314,7 +314,7 @@ class CustomProvider implements CommerceProvider {
 
   async getPage(handle: string): Promise<Page | undefined> {
     try {
-      return await this.fetch<Page>(`/pages/${handle}`);
+      return await apiClient.get<Page>(`/pages/${handle}`);
     } catch (error) {
       console.error("Failed to get page:", error);
       return undefined;
@@ -323,7 +323,7 @@ class CustomProvider implements CommerceProvider {
 
   async getPages(): Promise<Page[]> {
     try {
-      return await this.fetch<Page[]>("/pages");
+      return await apiClient.get<Page[]>("/pages");
     } catch (error) {
       console.error("Failed to get pages:", error);
       return [];

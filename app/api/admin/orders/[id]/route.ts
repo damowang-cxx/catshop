@@ -1,57 +1,65 @@
 /**
- * 后台订单详情 API 路由
- * 对接后端 API，处理单个订单的获取和状态更新
+ * 单个订单管理 API 路由
+ * GET: 获取订单详情
+ * PATCH: 更新订单状态
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { adminApiClient } from "lib/api/admin-client";
+import { cookies } from "next/headers";
 
-/**
- * GET /api/admin/orders/:id
- * 获取订单详情
- * 对接后端: GET /api/admin/orders/:id
- */
+const backendUrl = process.env.CUSTOM_API_BASE_URL || "http://localhost:3001/api";
+
+async function getAuthHeaders() {
+  const cookieStore = await cookies();
+  const adminToken = cookieStore.get("admin_token");
+  
+  return {
+    "Content-Type": "application/json",
+    ...(adminToken ? { Authorization: `Bearer ${adminToken.value}` } : {}),
+  };
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
-    const order = await adminApiClient.get<any>(`/orders/${id}`);
+    const response = await fetch(`${backendUrl}/orders/${params.id}`, {
+      method: "GET",
+      headers: await getAuthHeaders(),
+    });
 
-    return NextResponse.json(order);
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
   } catch (error: any) {
     console.error("获取订单详情失败:", error);
     return NextResponse.json(
-      { error: error.message || "获取订单详情失败" },
-      { status: error.status || 500 }
+      { error: "获取订单详情失败" },
+      { status: 500 }
     );
   }
 }
 
-/**
- * PATCH /api/admin/orders/:id/status
- * 更新订单状态
- * 对接后端: PATCH /api/admin/orders/:id/status
- */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
     const body = await request.json();
-    const order = await adminApiClient.patch<any>(
-      `/orders/${id}/status`,
-      body
-    );
 
-    return NextResponse.json(order);
+    const response = await fetch(`${backendUrl}/orders/${params.id}`, {
+      method: "PATCH",
+      headers: await getAuthHeaders(),
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
   } catch (error: any) {
-    console.error("更新订单状态失败:", error);
+    console.error("更新订单失败:", error);
     return NextResponse.json(
-      { error: error.message || "更新订单状态失败" },
-      { status: error.status || 500 }
+      { error: "更新订单失败" },
+      { status: 500 }
     );
   }
 }

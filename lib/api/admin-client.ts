@@ -1,34 +1,30 @@
 /**
  * 后台管理 API 客户端
- * 专门用于后台管理系统的 API 请求，使用 admin_token 进行认证
+ * 专门用于后台管理面板的 API 请求
  */
 
 import { cookies } from "next/headers";
 
-export interface ApiError {
+export interface AdminApiError {
   message: string;
   status: number;
   errors?: Record<string, string[]>;
 }
 
-export interface ApiResponse<T> {
+export interface AdminApiResponse<T> {
   data: T;
   message?: string;
 }
 
 /**
- * 服务端后台管理 API 客户端
- * 用于服务端组件和 Server Actions
+ * 服务端后台 API 客户端
  */
 class AdminApiClient {
   private baseURL: string;
 
   constructor() {
-    // 后台 API 地址，默认使用 CUSTOM_API_BASE_URL + /admin
     this.baseURL =
-      process.env.ADMIN_API_BASE_URL ||
-      process.env.CUSTOM_API_BASE_URL?.replace("/api", "/api/admin") ||
-      "http://localhost:3001/api/admin";
+      process.env.CUSTOM_API_BASE_URL || "http://localhost:3001/api";
   }
 
   /**
@@ -68,7 +64,7 @@ class AdminApiClient {
    */
   private async handleResponse<T>(
     response: Response
-  ): Promise<ApiResponse<T>> {
+  ): Promise<AdminApiResponse<T>> {
     const contentType = response.headers.get("content-type");
 
     if (!response.ok) {
@@ -85,7 +81,7 @@ class AdminApiClient {
         }
       }
 
-      const error: ApiError = {
+      const error: AdminApiError = {
         message: errorMessage,
         status: response.status,
         errors,
@@ -95,11 +91,8 @@ class AdminApiClient {
     }
 
     // 处理空响应
-    if (
-      response.status === 204 ||
-      response.headers.get("content-length") === "0"
-    ) {
-      return {} as ApiResponse<T>;
+    if (response.status === 204 || response.headers.get("content-length") === "0") {
+      return {} as AdminApiResponse<T>;
     }
 
     const data = contentType?.includes("application/json")
@@ -108,7 +101,7 @@ class AdminApiClient {
 
     // 如果后端返回的是 { data: T } 格式，直接返回
     if (data && typeof data === "object" && "data" in data) {
-      return data as ApiResponse<T>;
+      return data as AdminApiResponse<T>;
     }
 
     // 否则包装成统一格式
@@ -124,24 +117,46 @@ class AdminApiClient {
     endpoint: string,
     params?: Record<string, string | number | boolean | undefined>
   ): Promise<T> {
-    const url = new URL(`${this.baseURL}${endpoint}`);
+    try {
+      const url = new URL(`${this.baseURL}${endpoint}`);
 
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          url.searchParams.append(key, String(value));
-        }
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            url.searchParams.append(key, String(value));
+          }
+        });
+      }
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: await this.buildHeaders(),
+        cache: "no-store", // 服务端组件默认不缓存
       });
+
+      const result = await this.handleResponse<T>(response);
+      return result.data;
+    } catch (error: any) {
+      // 处理网络连接错误（后端未运行）
+      const errorMessage = error?.message || String(error);
+      const errorCode = error?.cause?.code || error?.code;
+      
+      if (
+        errorCode === "ECONNREFUSED" ||
+        errorMessage.includes("fetch failed") ||
+        errorMessage.includes("ECONNREFUSED") ||
+        errorMessage.includes("network")
+      ) {
+        // 后端不可用时，抛出特殊错误，让调用者知道是网络问题
+        const networkError = new Error("后端服务不可用");
+        (networkError as any).isNetworkError = true;
+        (networkError as any).code = "ECONNREFUSED";
+        throw networkError;
+      }
+      
+      // 其他错误直接抛出
+      throw error;
     }
-
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: await this.buildHeaders(),
-      cache: "no-store", // 服务端组件默认不缓存
-    });
-
-    const result = await this.handleResponse<T>(response);
-    return result.data;
   }
 
   /**
@@ -217,22 +232,20 @@ class AdminApiClient {
 export const adminApiClient = new AdminApiClient();
 
 /**
- * 客户端后台管理 API 客户端
- * 用于客户端组件
+ * 客户端后台 API 客户端（用于客户端组件）
  */
 export class ClientAdminApiClient {
   private baseURL: string;
 
   constructor() {
     this.baseURL =
-      process.env.NEXT_PUBLIC_ADMIN_API_BASE_URL ||
-      process.env.NEXT_PUBLIC_CUSTOM_API_BASE_URL?.replace("/api", "/api/admin") ||
-      process.env.CUSTOM_API_BASE_URL?.replace("/api", "/api/admin") ||
-      "http://localhost:3001/api/admin";
+      process.env.NEXT_PUBLIC_CUSTOM_API_BASE_URL ||
+      process.env.CUSTOM_API_BASE_URL ||
+      "http://localhost:3001/api";
   }
 
   private getAdminToken(): string | null {
-    // 客户端获取 token 的方式（从 cookie 读取）
+    // 客户端获取 token 的方式（从 cookie）
     if (typeof document !== "undefined") {
       const cookies = document.cookie.split("; ");
       const tokenCookie = cookies.find((c) => c.startsWith("admin_token="));
