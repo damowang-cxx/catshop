@@ -1,0 +1,25 @@
+{
+  "common": {
+    "welcome": "Benvenuto in",
+    "store": "Negozio di Peluche Carini",
+    "subtitle": "Scopri i peluche più caldi e carini",
+    "subtitle2": "Lascia che ogni peluche diventi il tuo migliore amico",
+    "shopNow": "Acquista ora",
+    "browseAll": "Sfoglia tutti i prodotti",
+    "featuredProducts": "Prodotti in evidenza",
+    "featuredProductsDesc": "Ogni articolo è un peluche carino accuratamente selezionato",
+    "loading": "Caricamento...",
+    "search": "Cerca",
+    "searchPlaceholder": "Cerca peluche carini...",
+    "admin": "Amministrazione",
+    "home": "Home",
+    "allProducts": "Tutti i prodotti",
+    "about": "Chi siamo",
+    "contact": "Contatti",
+    "privacy": "Informativa sulla privacy",
+    "terms": "Termini di servizio",
+    "rights": "Tutti i diritti riservati",
+    "footerDesc": "Un negozio di peluche caldo e carino",
+    "footerDesc2": "Lascia che ogni peluche diventi il tuo migliore amico"
+  }
+}

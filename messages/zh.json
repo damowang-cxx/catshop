@@ -1,0 +1,25 @@
+{
+  "common": {
+    "welcome": "欢迎来到",
+    "store": "可爱玩偶商店",
+    "subtitle": "发现最温馨、最可爱的毛绒玩具",
+    "subtitle2": "让每一个玩偶都成为你最好的朋友",
+    "shopNow": "立即选购",
+    "browseAll": "浏览全部商品",
+    "featuredProducts": "精选商品",
+    "featuredProductsDesc": "每一件都是精心挑选的可爱玩偶",
+    "loading": "加载中...",
+    "search": "搜索",
+    "searchPlaceholder": "搜索可爱的玩偶...",
+    "admin": "管理后台",
+    "home": "首页",
+    "allProducts": "全部商品",
+    "about": "关于我们",
+    "contact": "联系我们",
+    "privacy": "隐私政策",
+    "terms": "服务条款",
+    "rights": "All rights reserved",
+    "footerDesc": "一个温馨可爱的玩偶商店",
+    "footerDesc2": "让每一个玩偶都成为你最好的朋友"
+  }
+}

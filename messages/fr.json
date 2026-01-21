@@ -1,0 +1,25 @@
+{
+  "common": {
+    "welcome": "Bienvenue dans",
+    "store": "Boutique de Peluches Mignonnes",
+    "subtitle": "Découvrez les peluches les plus chaleureuses et mignonnes",
+    "subtitle2": "Laissez chaque peluche devenir votre meilleur ami",
+    "shopNow": "Acheter maintenant",
+    "browseAll": "Parcourir tous les produits",
+    "featuredProducts": "Produits vedettes",
+    "featuredProductsDesc": "Chaque article est une peluche mignonne soigneusement sélectionnée",
+    "loading": "Chargement...",
+    "search": "Rechercher",
+    "searchPlaceholder": "Rechercher des peluches mignonnes...",
+    "admin": "Administration",
+    "home": "Accueil",
+    "allProducts": "Tous les produits",
+    "about": "À propos",
+    "contact": "Contact",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "rights": "Tous droits réservés",
+    "footerDesc": "Une boutique de peluches chaleureuse et mignonne",
+    "footerDesc2": "Laissez chaque peluche devenir votre meilleur ami"
+  }
+}

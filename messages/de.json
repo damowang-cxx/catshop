@@ -1,0 +1,25 @@
+{
+  "common": {
+    "welcome": "Willkommen bei",
+    "store": "Süßer Plüschtier-Laden",
+    "subtitle": "Entdecken Sie die wärmsten und süßesten Plüschtiere",
+    "subtitle2": "Lassen Sie jedes Plüschtier zu Ihrem besten Freund werden",
+    "shopNow": "Jetzt einkaufen",
+    "browseAll": "Alle Produkte durchsuchen",
+    "featuredProducts": "Empfohlene Produkte",
+    "featuredProductsDesc": "Jedes Produkt ist sorgfältig ausgewähltes süßes Plüschtier",
+    "loading": "Lädt...",
+    "search": "Suchen",
+    "searchPlaceholder": "Nach süßen Plüschtieren suchen...",
+    "admin": "Verwaltung",
+    "home": "Startseite",
+    "allProducts": "Alle Produkte",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "privacy": "Datenschutzrichtlinie",
+    "terms": "Nutzungsbedingungen",
+    "rights": "Alle Rechte vorbehalten",
+    "footerDesc": "Ein warmer und süßer Plüschtier-Laden",
+    "footerDesc2": "Lassen Sie jedes Plüschtier zu Ihrem besten Freund werden"
+  }
+}

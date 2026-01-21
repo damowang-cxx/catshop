@@ -1,0 +1,25 @@
+{
+  "common": {
+    "welcome": "Welcome to",
+    "store": "Cute Plushie Store",
+    "subtitle": "Discover the warmest and cutest plush toys",
+    "subtitle2": "Let every plushie become your best friend",
+    "shopNow": "Shop Now",
+    "browseAll": "Browse All Products",
+    "featuredProducts": "Featured Products",
+    "featuredProductsDesc": "Every item is carefully selected cute plushie",
+    "loading": "Loading...",
+    "search": "Search",
+    "searchPlaceholder": "Search for cute plushies...",
+    "admin": "Admin",
+    "home": "Home",
+    "allProducts": "All Products",
+    "about": "About Us",
+    "contact": "Contact Us",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "rights": "All rights reserved",
+    "footerDesc": "A warm and cute plushie store",
+    "footerDesc2": "Let every plushie become your best friend"
+  }
+}
