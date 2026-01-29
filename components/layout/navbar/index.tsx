@@ -6,6 +6,7 @@ import { Menu } from "lib/types";
 import MobileMenu from "./mobile-menu";
 import Search, { SearchSkeleton } from "./search";
 import LanguageSwitcher from "components/language-switcher";
+import UserMenu from "./user-menu";
 import { type Locale } from "lib/i18n/config";
 import { addLocaleToPath } from "lib/i18n/utils";
 import { t } from "lib/i18n";
@@ -53,6 +54,9 @@ export default async function Navbar({ locale }: { locale: Locale }) {
         </div>
         <div className="flex items-center justify-end gap-3 md:w-1/3">
           <LanguageSwitcher currentLocale={locale} />
+          <Suspense fallback={<div className="h-8 w-32 bg-pink-200/50 rounded-lg animate-pulse"></div>}>
+            <UserMenu locale={locale} />
+          </Suspense>
           <Link
             href="/admin"
             className="rounded-lg px-4 py-2 text-sm font-medium text-stone-600 transition-all duration-300 hover:bg-pink-100 hover:text-rose-600 hover:shadow-sm"

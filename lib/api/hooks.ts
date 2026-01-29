@@ -188,11 +188,21 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const response = await clientApi.post<{ user: any; token: string }>(
-        "/auth/login",
-        params
-      );
-      const transformedUser = transformUser(response.user);
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Login failed");
+      }
+
+      const data = await response.json();
+      const transformedUser = transformUser(data.user);
       setUser(transformedUser);
       return transformedUser;
     } catch (err) {
@@ -208,11 +218,21 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const response = await clientApi.post<{ user: any; token: string }>(
-        "/auth/register",
-        params
-      );
-      const transformedUser = transformUser(response.user);
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Registration failed");
+      }
+
+      const data = await response.json();
+      const transformedUser = transformUser(data.user);
       setUser(transformedUser);
       return transformedUser;
     } catch (err) {
@@ -228,7 +248,12 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      await clientApi.post("/auth/logout");
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       setUser(null);
     } catch (err) {
       console.error("Logout error:", err);
@@ -242,7 +267,23 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const apiUser = await clientApi.get<any>("/auth/me");
+      const response = await fetch("/api/auth/me", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        // 401 表示未登录，这是正常情况
+        if (response.status === 401) {
+          setUser(null);
+          return null;
+        }
+        throw new Error("Failed to fetch user");
+      }
+
+      const apiUser = await response.json();
       const transformedUser = transformUser(apiUser);
       setUser(transformedUser);
       return transformedUser;
