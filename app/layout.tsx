@@ -4,6 +4,8 @@ import "./globals.css";
 import { FeaturesProvider } from "components/features/features-provider";
 import Navbar from "components/layout/navbar";
 import Footer from "components/layout/footer";
+import { defaultLocale } from "lib/i18n/config";
+import { getCommerceFeatures } from "lib/commerce";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
@@ -32,15 +34,17 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const features = getCommerceFeatures();
+
   return (
     <html lang="zh-CN" className={GeistSans.className}>
       <body className="bg-gradient-to-br from-pink-50 via-amber-50 to-rose-50 text-black antialiased">
-        <FeaturesProvider>
-          <Navbar />
+        <FeaturesProvider features={features}>
+          <Navbar locale={defaultLocale} />
           <main className="min-h-screen">
             {children}
           </main>
-          <Footer />
+          <Footer locale={defaultLocale} />
         </FeaturesProvider>
       </body>
     </html>

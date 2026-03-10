@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 const backendUrl = process.env.CUSTOM_API_BASE_URL || "http://localhost:3001/api";
+type RouteContext = { params: Promise<{ id: string }> };
 
 async function getAuthHeaders() {
   const cookieStore = await cookies();
@@ -22,10 +23,11 @@ async function getAuthHeaders() {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteContext
 ) {
   try {
-    const response = await fetch(`${backendUrl}/products/${params.id}`, {
+    const { id } = await params;
+    const response = await fetch(`${backendUrl}/products/${id}`, {
       method: "GET",
       headers: await getAuthHeaders(),
     });
@@ -43,12 +45,13 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteContext
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
 
-    const response = await fetch(`${backendUrl}/products/${params.id}`, {
+    const response = await fetch(`${backendUrl}/products/${id}`, {
       method: "PUT",
       headers: await getAuthHeaders(),
       body: JSON.stringify(body),
@@ -67,10 +70,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteContext
 ) {
   try {
-    const response = await fetch(`${backendUrl}/products/${params.id}`, {
+    const { id } = await params;
+    const response = await fetch(`${backendUrl}/products/${id}`, {
       method: "DELETE",
       headers: await getAuthHeaders(),
     });

@@ -16,7 +16,7 @@ export function getCommerceProvider(): CommerceProvider {
     return providerInstance;
   }
 
-  const providerName = process.env.COMMERCE_PROVIDER || "local";
+  const providerName = process.env.COMMERCE_PROVIDER || "custom";
 
   switch (providerName) {
     case "local":
@@ -30,9 +30,9 @@ export function getCommerceProvider(): CommerceProvider {
       break;
     default:
       console.warn(
-        `Unknown COMMERCE_PROVIDER: ${providerName}, falling back to local`
+        `Unknown COMMERCE_PROVIDER: ${providerName}, falling back to custom`
       );
-      providerInstance = new LocalProvider();
+      providerInstance = customProvider;
   }
 
   // 合并 commerce.config.json 中的功能配置
@@ -119,3 +119,4 @@ export const updateCart = commerce.updateCart;
 export const getMenu = commerce.getMenu;
 export const getPage = commerce.getPage;
 export const getPages = commerce.getPages;
+export const revalidate = commerce.revalidate;

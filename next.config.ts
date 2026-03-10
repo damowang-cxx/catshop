@@ -1,10 +1,14 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
   experimental: {
     ppr: true,
     inlineCss: true,
     useCache: true,
+  },
+  turbopack: {
+    root: path.join(__dirname, ".."),
   },
   images: {
     formats: ["image/avif", "image/webp"],

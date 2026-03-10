@@ -18,7 +18,7 @@ export default async function Navbar({ locale }: { locale: Locale }) {
     <nav className="sticky top-0 z-50 flex items-center justify-between border-b border-pink-200/50 bg-gradient-to-r from-pink-50/95 via-rose-50/95 to-amber-50/95 p-4 backdrop-blur-sm shadow-sm lg:px-6">
       <div className="block flex-none md:hidden">
         <Suspense fallback={null}>
-          <MobileMenu menu={menu} />
+          <MobileMenu menu={menu} locale={locale} />
         </Suspense>
       </div>
       <div className="flex w-full items-center">

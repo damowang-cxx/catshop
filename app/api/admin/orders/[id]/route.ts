@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 const backendUrl = process.env.CUSTOM_API_BASE_URL || "http://localhost:3001/api";
+type RouteContext = { params: Promise<{ id: string }> };
 
 async function getAuthHeaders() {
   const cookieStore = await cookies();
@@ -21,10 +22,11 @@ async function getAuthHeaders() {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteContext
 ) {
   try {
-    const response = await fetch(`${backendUrl}/orders/${params.id}`, {
+    const { id } = await params;
+    const response = await fetch(`${backendUrl}/orders/${id}`, {
       method: "GET",
       headers: await getAuthHeaders(),
     });
@@ -42,12 +44,13 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteContext
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
 
-    const response = await fetch(`${backendUrl}/orders/${params.id}`, {
+    const response = await fetch(`${backendUrl}/orders/${id}`, {
       method: "PATCH",
       headers: await getAuthHeaders(),
       body: JSON.stringify(body),

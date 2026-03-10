@@ -47,13 +47,11 @@ class AdminApiClient {
     customHeaders?: HeadersInit
   ): Promise<HeadersInit> {
     const token = await this.getAdminToken();
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
-      ...customHeaders,
-    };
+    const headers = new Headers(customHeaders);
+    headers.set("Content-Type", "application/json");
 
     if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
+      headers.set("Authorization", `Bearer ${token}`);
     }
 
     return headers;
@@ -250,7 +248,8 @@ export class ClientAdminApiClient {
       const cookies = document.cookie.split("; ");
       const tokenCookie = cookies.find((c) => c.startsWith("admin_token="));
       if (tokenCookie) {
-        return tokenCookie.split("=")[1];
+        const [, token] = tokenCookie.split("=");
+        return token || null;
       }
     }
     return null;
@@ -258,13 +257,11 @@ export class ClientAdminApiClient {
 
   private buildHeaders(customHeaders?: HeadersInit): HeadersInit {
     const token = this.getAdminToken();
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
-      ...customHeaders,
-    };
+    const headers = new Headers(customHeaders);
+    headers.set("Content-Type", "application/json");
 
     if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
+      headers.set("Authorization", `Bearer ${token}`);
     }
 
     return headers;

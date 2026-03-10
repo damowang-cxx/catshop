@@ -7,9 +7,17 @@ import { Fragment, Suspense, useEffect, useState } from "react";
 
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Menu } from "lib/types";
+import { type Locale } from "lib/i18n/config";
+import { addLocaleToPath } from "lib/i18n/utils";
 import Search, { SearchSkeleton } from "./search";
 
-export default function MobileMenu({ menu }: { menu: Menu[] }) {
+export default function MobileMenu({
+  menu,
+  locale,
+}: {
+  menu: Menu[];
+  locale: Locale;
+}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
@@ -72,8 +80,8 @@ export default function MobileMenu({ menu }: { menu: Menu[] }) {
                 </button>
 
                 <div className="mb-4 w-full">
-                  <Suspense fallback={<SearchSkeleton />}>
-                    <Search />
+                  <Suspense fallback={<SearchSkeleton locale={locale} />}>
+                    <Search locale={locale} />
                   </Suspense>
                 </div>
                 {menu.length ? (
@@ -84,7 +92,7 @@ export default function MobileMenu({ menu }: { menu: Menu[] }) {
                         key={item.title}
                       >
                         <Link
-                          href={item.path}
+                          href={addLocaleToPath(item.path, locale)}
                           prefetch={true}
                           onClick={closeMobileMenu}
                         >

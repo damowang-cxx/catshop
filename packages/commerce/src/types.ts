@@ -207,3 +207,6 @@ export type CheckoutParams = {
     phone?: string;
   };
 };
+
+export type { CommerceProvider } from "./provider";
+export type { CommerceFeatures } from "./features";

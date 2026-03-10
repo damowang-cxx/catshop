@@ -11,6 +11,7 @@ import {
 import { updateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import type { CartItem } from "lib/types";
 
 export async function addItem(
   prevState: any,
@@ -37,7 +38,7 @@ export async function removeItem(prevState: any, merchandiseId: string) {
     }
 
     const lineItem = cart.lines.find(
-      (line) => line.merchandise.id === merchandiseId
+      (line: CartItem) => line.merchandise.id === merchandiseId
     );
 
     if (lineItem && lineItem.id) {
@@ -68,7 +69,7 @@ export async function updateItemQuantity(
     }
 
     const lineItem = cart.lines.find(
-      (line) => line.merchandise.id === merchandiseId
+      (line: CartItem) => line.merchandise.id === merchandiseId
     );
 
     if (lineItem && lineItem.id) {

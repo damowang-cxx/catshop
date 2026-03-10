@@ -20,7 +20,7 @@ import type {
 } from "@commerce/types";
 import { fullFeatures } from "@commerce/features";
 import { cookies } from "next/headers";
-import { apiClient } from "lib/api/client";
+import { apiClient } from "lib/api/server-client";
 import {
   transformProduct,
   transformCollection,

@@ -37,12 +37,13 @@ export function getCommerceConfig(): CommerceConfig {
     const config: CommerceConfig = JSON.parse(configContent);
     
     // 处理环境变量替换
-    if (config.provider?.config) {
-      Object.keys(config.provider.config).forEach((key) => {
-        const value = config.provider!.config![key];
+    const providerConfig = config.provider?.config;
+    if (providerConfig) {
+      Object.keys(providerConfig).forEach((key) => {
+        const value = providerConfig[key];
         if (typeof value === "string" && value.startsWith("${") && value.endsWith("}")) {
           const envVar = value.slice(2, -1);
-          config.provider.config![key] = process.env[envVar] || value;
+          providerConfig[key] = process.env[envVar] || value;
         }
       });
     }
