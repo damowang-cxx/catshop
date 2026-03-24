@@ -2,6 +2,7 @@
 
 import clsx from "clsx";
 import type { SortFilterItem } from "lib/constants";
+import { addLocaleToPath, getLocaleFromPath } from "lib/i18n/utils";
 import { createUrl } from "lib/utils";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -10,16 +11,21 @@ import type { ListItem, PathFilterItem } from ".";
 function PathFilterItem({ item }: { item: PathFilterItem }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const active = pathname === item.path;
+  const locale = getLocaleFromPath(pathname);
+  const localizedPath = addLocaleToPath(item.path, locale);
+  const active = pathname === localizedPath;
   const newParams = new URLSearchParams(searchParams.toString());
   const DynamicTag = active ? "p" : Link;
 
   newParams.delete("q");
 
   return (
-    <li className="mt-2 flex text-stone-900 dark:text-stone-100" key={item.title}>
+    <li
+      className="mt-2 flex text-stone-900 dark:text-stone-100"
+      key={item.title}
+    >
       <DynamicTag
-        href={createUrl(item.path, newParams)}
+        href={createUrl(localizedPath, newParams)}
         className={clsx(
           "w-full text-sm underline-offset-4 hover:underline dark:hover:text-stone-200",
           {

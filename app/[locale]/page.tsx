@@ -38,7 +38,9 @@ export default async function HomePage({
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-3xl font-bold text-rose-600 md:text-4xl">
             <span className="inline-block animate-bounce delay-100">✨</span>
-            <span className="mx-2">{t(locale as Locale, "common", "featuredProducts")}</span>
+            <span className="mx-2">
+              {t(locale as Locale, "common", "featuredProducts")}
+            </span>
             <span className="inline-block animate-bounce delay-200">✨</span>
           </h2>
           <p className="text-lg text-stone-600">
@@ -47,9 +49,15 @@ export default async function HomePage({
         </div>
 
         {/* 产品网格 */}
-        <Suspense fallback={<div className="text-center py-12">{t(locale as Locale, "common", "loading")}</div>}>
+        <Suspense
+          fallback={
+            <div className="text-center py-12">
+              {t(locale as Locale, "common", "loading")}
+            </div>
+          }
+        >
           <Grid className="grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <ProductGridItems products={products} />
+            <ProductGridItems products={products} locale={locale as Locale} />
           </Grid>
         </Suspense>
 

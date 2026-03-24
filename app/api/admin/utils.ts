@@ -1,7 +1,7 @@
-import { cookies } from "next/headers";
+﻿import { cookies } from "next/headers";
 
 export const backendUrl =
-  process.env.CUSTOM_API_BASE_URL || "http://localhost:3001/api";
+  process.env.CUSTOM_API_BASE_URL || "http://127.0.0.1:3001/api";
 
 export async function getAdminAuthorizationHeader(): Promise<{
   Authorization?: string;
@@ -26,4 +26,5 @@ export async function readResponsePayload(
 
   return response.text();
 }
+
 

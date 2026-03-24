@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     const authHeader = await getAdminAuthorizationHeader();
-    const response = await fetch(`${backendUrl}/products/bulk`, {
+    const response = await fetch(`${backendUrl}/admin/products/bulk`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -60,4 +60,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
 

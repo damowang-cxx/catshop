@@ -47,7 +47,7 @@ async function getProducts(params: {
   status: string;
 }): Promise<PaginatedResponse<Product>> {
   try {
-    const payload = await adminApiClient.get<unknown>("/products", {
+    const payload = await adminApiClient.get<unknown>("/admin/products", {
       page: params.page,
       pageSize: params.pageSize,
       q: params.q || undefined,
@@ -105,3 +105,4 @@ export default async function ProductsPage({
     </div>
   );
 }
+

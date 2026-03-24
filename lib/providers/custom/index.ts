@@ -1,41 +1,38 @@
-// 自定义 Provider - 对接自研后端 API
-
-import type {
-  CommerceProvider,
-  Product,
-  Collection,
-  Cart,
-  Menu,
-  Page,
-  Order,
-  User,
-  GetProductsParams,
-  GetCollectionProductsParams,
+﻿import type {
   AddToCartParams,
-  UpdateCartParams,
-  LoginParams,
-  RegisterParams,
+  Cart,
   CheckoutParams,
+  Collection,
   CommerceFeatures,
+  CommerceProvider,
+  GetCollectionProductsParams,
+  GetProductsParams,
+  LoginParams,
+  Menu,
+  Order,
+  Page,
+  Product,
+  RegisterParams,
+  UpdateCartParams,
+  User,
 } from "@commerce/types";
 import { fullFeatures } from "@commerce/features";
 import { cookies } from "next/headers";
 import { apiClient } from "lib/api/server-client";
+import { clearCartCookie, setCartCookie } from "lib/cart/cookies";
 import {
-  transformProduct,
-  transformCollection,
   transformCart,
+  transformCollection,
   transformOrder,
+  transformProduct,
   transformUser,
 } from "lib/api/transformers";
 
 class CustomProvider implements CommerceProvider {
-  // 功能特性声明 - 自定义 Provider 支持所有功能
   features: CommerceFeatures = {
     ...fullFeatures,
   };
 
-  // 产品相关
   async getProduct(handle: string): Promise<Product | undefined> {
     try {
       const apiProduct = await apiClient.get<any>(`/products/${handle}`);
@@ -73,7 +70,6 @@ class CustomProvider implements CommerceProvider {
     }
   }
 
-  // 分类相关
   async getCollection(handle: string): Promise<Collection | undefined> {
     try {
       const apiCollection = await apiClient.get<any>(`/collections/${handle}`);
@@ -85,33 +81,21 @@ class CustomProvider implements CommerceProvider {
   }
 
   async getCollections(): Promise<Collection[]> {
+    const allCollection: Collection = {
+      handle: "",
+      title: "全部",
+      description: "所有产品",
+      seo: { title: "全部", description: "所有产品" },
+      path: "/search",
+      updatedAt: new Date().toISOString(),
+    };
+
     try {
       const apiCollections = await apiClient.get<any[]>("/collections");
-      const collections = apiCollections.map(transformCollection);
-      // 添加 "全部" 分类
-      return [
-        {
-          handle: "",
-          title: "全部",
-          description: "所有产品",
-          seo: { title: "全部", description: "所有产品" },
-          path: "/search",
-          updatedAt: new Date().toISOString(),
-        },
-        ...collections,
-      ];
+      return [allCollection, ...apiCollections.map(transformCollection)];
     } catch (error) {
       console.error("Failed to get collections:", error);
-      return [
-        {
-          handle: "",
-          title: "全部",
-          description: "所有产品",
-          seo: { title: "全部", description: "所有产品" },
-          path: "/search",
-          updatedAt: new Date().toISOString(),
-        },
-      ];
+      return [allCollection];
     }
   }
 
@@ -136,7 +120,6 @@ class CustomProvider implements CommerceProvider {
     }
   }
 
-  // 购物车相关
   async getCart(): Promise<Cart | undefined> {
     try {
       const cookieStore = await cookies();
@@ -155,13 +138,9 @@ class CustomProvider implements CommerceProvider {
     const apiCart = await apiClient.post<any>("/cart");
     const cart = transformCart(apiCart);
 
-    // 设置 cartId cookie
-    const cookieStore = await cookies();
-    cookieStore.set("cartId", cart.id!, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    });
+    if (cart.id) {
+      await setCartCookie(cart.id);
+    }
 
     return cart;
   }
@@ -171,9 +150,12 @@ class CustomProvider implements CommerceProvider {
     let cartId = cookieStore.get("cartId")?.value;
 
     if (!cartId) {
-      // 如果没有购物车，先创建一个
       const newCart = await this.createCart();
-      cartId = newCart.id!;
+      cartId = newCart.id;
+    }
+
+    if (!cartId) {
+      throw new Error("Cart not found");
     }
 
     const apiCart = await apiClient.post<any>(`/cart/${cartId}/items`, {
@@ -218,20 +200,18 @@ class CustomProvider implements CommerceProvider {
     return transformCart(apiCart);
   }
 
-  // 用户相关
   async login(params: LoginParams): Promise<User> {
     const response = await apiClient.post<{ user: any; token: string }>(
       "/auth/login",
       params
     );
 
-    // 设置认证 token cookie
     const cookieStore = await cookies();
     cookieStore.set("auth_token", response.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 天
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     return transformUser(response.user);
@@ -243,13 +223,12 @@ class CustomProvider implements CommerceProvider {
       params
     );
 
-    // 设置认证 token cookie
     const cookieStore = await cookies();
     cookieStore.set("auth_token", response.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 天
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     return transformUser(response.user);
@@ -259,7 +238,6 @@ class CustomProvider implements CommerceProvider {
     try {
       await apiClient.post("/auth/logout");
     } catch (error) {
-      // 即使 API 调用失败，也清除本地 token
       console.error("Logout API error:", error);
     } finally {
       const cookieStore = await cookies();
@@ -271,14 +249,19 @@ class CustomProvider implements CommerceProvider {
     try {
       const apiUser = await apiClient.get<any>("/auth/me");
       return transformUser(apiUser);
-    } catch (error) {
+    } catch {
       return null;
     }
   }
 
-  // 订单相关
   async createOrder(params: CheckoutParams): Promise<Order> {
+    const cookieStore = await cookies();
+    if (!cookieStore.get("auth_token")?.value) {
+      throw new Error("Authentication required to create an order.");
+    }
+
     const apiOrder = await apiClient.post<any>("/orders", params);
+    await clearCartCookie();
     return transformOrder(apiOrder);
   }
 
@@ -302,7 +285,6 @@ class CustomProvider implements CommerceProvider {
     }
   }
 
-  // 其他
   async getMenu(handle: string): Promise<Menu[]> {
     try {
       return await apiClient.get<Menu[]>(`/menus/${handle}`);
@@ -332,3 +314,4 @@ class CustomProvider implements CommerceProvider {
 }
 
 export const customProvider = new CustomProvider();
+

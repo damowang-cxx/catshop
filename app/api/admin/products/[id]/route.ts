@@ -1,25 +1,11 @@
-/**
- * 单个产品管理 API 路由
- * GET: 获取产品详情
- * PUT: 更新产品
- * DELETE: 删除产品
- */
-
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import {
+  backendUrl,
+  getAdminAuthorizationHeader,
+  readResponsePayload,
+} from "app/api/admin/utils";
 
-const backendUrl = process.env.CUSTOM_API_BASE_URL || "http://localhost:3001/api";
 type RouteContext = { params: Promise<{ id: string }> };
-
-async function getAuthHeaders() {
-  const cookieStore = await cookies();
-  const adminToken = cookieStore.get("admin_token");
-  
-  return {
-    "Content-Type": "application/json",
-    ...(adminToken ? { Authorization: `Bearer ${adminToken.value}` } : {}),
-  };
-}
 
 export async function GET(
   request: NextRequest,
@@ -27,17 +13,18 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const response = await fetch(`${backendUrl}/products/${id}`, {
+    const authHeader = await getAdminAuthorizationHeader();
+    const response = await fetch(`${backendUrl}/admin/products/${id}`, {
       method: "GET",
-      headers: await getAuthHeaders(),
+      headers: authHeader,
     });
 
-    const data = await response.json();
-    return NextResponse.json(data, { status: response.status });
-  } catch (error: any) {
-    console.error("获取产品详情失败:", error);
+    const payload = await readResponsePayload(response);
+    return NextResponse.json(payload, { status: response.status });
+  } catch (error) {
+    console.error("Failed to fetch product details:", error);
     return NextResponse.json(
-      { error: "获取产品详情失败" },
+      { error: "Failed to fetch product details." },
       { status: 500 }
     );
   }
@@ -50,19 +37,22 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-
-    const response = await fetch(`${backendUrl}/products/${id}`, {
+    const authHeader = await getAdminAuthorizationHeader();
+    const response = await fetch(`${backendUrl}/admin/products/${id}`, {
       method: "PUT",
-      headers: await getAuthHeaders(),
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeader,
+      },
       body: JSON.stringify(body),
     });
 
-    const data = await response.json();
-    return NextResponse.json(data, { status: response.status });
-  } catch (error: any) {
-    console.error("更新产品失败:", error);
+    const payload = await readResponsePayload(response);
+    return NextResponse.json(payload, { status: response.status });
+  } catch (error) {
+    console.error("Failed to update product:", error);
     return NextResponse.json(
-      { error: "更新产品失败" },
+      { error: "Failed to update product." },
       { status: 500 }
     );
   }
@@ -74,21 +64,22 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const response = await fetch(`${backendUrl}/products/${id}`, {
+    const authHeader = await getAdminAuthorizationHeader();
+    const response = await fetch(`${backendUrl}/admin/products/${id}`, {
       method: "DELETE",
-      headers: await getAuthHeaders(),
+      headers: authHeader,
     });
 
     if (response.status === 204) {
       return new NextResponse(null, { status: 204 });
     }
 
-    const data = await response.json();
-    return NextResponse.json(data, { status: response.status });
-  } catch (error: any) {
-    console.error("删除产品失败:", error);
+    const payload = await readResponsePayload(response);
+    return NextResponse.json(payload, { status: response.status });
+  } catch (error) {
+    console.error("Failed to delete product:", error);
     return NextResponse.json(
-      { error: "删除产品失败" },
+      { error: "Failed to delete product." },
       { status: 500 }
     );
   }

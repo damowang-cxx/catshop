@@ -1,15 +1,17 @@
 "use client";
 
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { addLocaleToPath, getLocaleFromPath } from "lib/i18n/utils";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import type { ListItem } from ".";
 import { FilterItem } from "./item";
 
 export default function FilterItemDropdown({ list }: { list: ListItem[] }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const locale = getLocaleFromPath(pathname);
   const [active, setActive] = useState("");
   const [openSelect, setOpenSelect] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -28,13 +30,14 @@ export default function FilterItemDropdown({ list }: { list: ListItem[] }) {
   useEffect(() => {
     list.forEach((listItem: ListItem) => {
       if (
-        ("path" in listItem && pathname === listItem.path) ||
+        ("path" in listItem &&
+          pathname === addLocaleToPath(listItem.path, locale)) ||
         ("slug" in listItem && searchParams.get("sort") === listItem.slug)
       ) {
         setActive(listItem.title);
       }
     });
-  }, [pathname, list, searchParams]);
+  }, [pathname, list, locale, searchParams]);
 
   return (
     <div className="relative" ref={ref}>

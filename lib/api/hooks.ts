@@ -1,32 +1,23 @@
 "use client";
 
-// 客户端 API Hooks - 用于客户端组件调用后端 API
-
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { clientApi } from "./client";
 import {
-  transformProduct,
-  transformCollection,
   transformCart,
-  transformOrder,
+  transformProduct,
   transformUser,
 } from "./transformers";
 import type {
-  Product,
-  Collection,
-  Cart,
-  Order,
-  User,
-  GetProductsParams,
   AddToCartParams,
-  UpdateCartParams,
+  Cart,
+  GetProductsParams,
   LoginParams,
+  Product,
   RegisterParams,
+  UpdateCartParams,
+  User,
 } from "@commerce/types";
 
-/**
- * 使用产品列表的 Hook
- */
 export function useProducts(params?: GetProductsParams) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
@@ -42,8 +33,7 @@ export function useProducts(params?: GetProductsParams) {
       if (params?.reverse) queryParams.reverse = "true";
 
       const apiProducts = await clientApi.get<any[]>("/products", queryParams);
-      const transformedProducts = apiProducts.map(transformProduct);
-      setProducts(transformedProducts);
+      setProducts(apiProducts.map(transformProduct));
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Failed to fetch products"));
     } finally {
@@ -54,116 +44,91 @@ export function useProducts(params?: GetProductsParams) {
   return { products, loading, error, fetchProducts };
 }
 
-/**
- * 使用购物车的 Hook
- */
 export function useCart() {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const getCartId = useCallback(() => {
-    if (typeof document === "undefined") return null;
-    const cookies = document.cookie.split("; ");
-    const cartCookie = cookies.find((c) => c.startsWith("cartId="));
-    return cartCookie ? cartCookie.split("=")[1] : null;
+  const fetchCart = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const apiCart = await clientApi.get<any | null>("/cart");
+      if (!apiCart) {
+        setCart(null);
+        return null;
+      }
+
+      const transformedCart = transformCart(apiCart);
+      setCart(transformedCart);
+      return transformedCart;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error("Failed to fetch cart"));
+      setCart(null);
+      return null;
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const fetchCart = useCallback(async () => {
-    const cartId = getCartId();
-    if (!cartId) {
-      setCart(null);
+  const addToCart = useCallback(async (lines: AddToCartParams[]) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const apiCart = await clientApi.post<any>("/cart/items", {
+        lines: lines.map((line) => ({
+          merchandiseId: line.merchandiseId,
+          quantity: line.quantity,
+        })),
+      });
+
+      setCart(transformCart(apiCart));
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error("Failed to add to cart"));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const removeFromCart = useCallback(async (lineIds: string[]) => {
+    if (lineIds.length === 0) {
       return;
     }
 
     setLoading(true);
     setError(null);
     try {
-      const apiCart = await clientApi.get<any>(`/cart/${cartId}`);
+      const apiCart = await clientApi.delete<any>("/cart/items", { lineIds });
       setCart(transformCart(apiCart));
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("Failed to fetch cart"));
-      setCart(null);
+      setError(err instanceof Error ? err : new Error("Failed to remove from cart"));
     } finally {
       setLoading(false);
     }
-  }, [getCartId]);
+  }, []);
 
-  const addToCart = useCallback(
-    async (lines: AddToCartParams[]) => {
-      setLoading(true);
-      setError(null);
-      try {
-        let cartId = getCartId();
-        if (!cartId) {
-          // 创建新购物车
-          const newCart = await clientApi.post<any>("/cart");
-          cartId = newCart.id || newCart._id;
-          document.cookie = `cartId=${cartId}; path=/; max-age=${60 * 60 * 24 * 30}`; // 30 天
-        }
+  const updateCart = useCallback(async (lines: UpdateCartParams[]) => {
+    if (lines.length === 0) {
+      return;
+    }
 
-        const apiCart = await clientApi.post<any>(`/cart/${cartId}/items`, {
-          lines: lines.map((line) => ({
-            merchandiseId: line.merchandiseId,
-            quantity: line.quantity,
-          })),
-        });
-
-        setCart(transformCart(apiCart));
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error("Failed to add to cart"));
-      } finally {
-        setLoading(false);
-      }
-    },
-    [getCartId]
-  );
-
-  const removeFromCart = useCallback(
-    async (lineIds: string[]) => {
-      const cartId = getCartId();
-      if (!cartId) return;
-
-      setLoading(true);
-      setError(null);
-      try {
-        const apiCart = await clientApi.delete<any>(`/cart/${cartId}/items`, {
-          lineIds,
-        });
-        setCart(transformCart(apiCart));
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error("Failed to remove from cart"));
-      } finally {
-        setLoading(false);
-      }
-    },
-    [getCartId]
-  );
-
-  const updateCart = useCallback(
-    async (lines: UpdateCartParams[]) => {
-      const cartId = getCartId();
-      if (!cartId) return;
-
-      setLoading(true);
-      setError(null);
-      try {
-        const apiCart = await clientApi.patch<any>(`/cart/${cartId}/items`, {
-          lines: lines.map((line) => ({
-            id: line.id,
-            merchandiseId: line.merchandiseId,
-            quantity: line.quantity,
-          })),
-        });
-        setCart(transformCart(apiCart));
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error("Failed to update cart"));
-      } finally {
-        setLoading(false);
-      }
-    },
-    [getCartId]
-  );
+    setLoading(true);
+    setError(null);
+    try {
+      const apiCart = await clientApi.patch<any>("/cart/items", {
+        lines: lines.map((line) => ({
+          id: line.id,
+          merchandiseId: line.merchandiseId,
+          quantity: line.quantity,
+        })),
+      });
+      setCart(transformCart(apiCart));
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error("Failed to update cart"));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return {
     cart,
@@ -176,9 +141,6 @@ export function useCart() {
   };
 }
 
-/**
- * 使用用户认证的 Hook
- */
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
@@ -206,9 +168,9 @@ export function useAuth() {
       setUser(transformedUser);
       return transformedUser;
     } catch (err) {
-      const error = err instanceof Error ? err : new Error("Login failed");
-      setError(error);
-      throw error;
+      const authError = err instanceof Error ? err : new Error("Login failed");
+      setError(authError);
+      throw authError;
     } finally {
       setLoading(false);
     }
@@ -236,9 +198,10 @@ export function useAuth() {
       setUser(transformedUser);
       return transformedUser;
     } catch (err) {
-      const error = err instanceof Error ? err : new Error("Registration failed");
-      setError(error);
-      throw error;
+      const authError =
+        err instanceof Error ? err : new Error("Registration failed");
+      setError(authError);
+      throw authError;
     } finally {
       setLoading(false);
     }
@@ -257,7 +220,7 @@ export function useAuth() {
       setUser(null);
     } catch (err) {
       console.error("Logout error:", err);
-      setUser(null); // 即使 API 失败也清除本地状态
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -275,7 +238,6 @@ export function useAuth() {
       });
 
       if (!response.ok) {
-        // 401 表示未登录，这是正常情况
         if (response.status === 401) {
           setUser(null);
           return null;

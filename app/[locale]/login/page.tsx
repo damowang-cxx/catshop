@@ -5,20 +5,29 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "lib/api/hooks";
 import { t } from "lib/i18n";
 import { addLocaleToPath } from "lib/i18n/utils";
-import { type Locale } from "lib/i18n/config";
+import { defaultLocale, isSupportedLocale } from "lib/i18n/config";
 
-export default function LoginPage({ params }: { params: { locale: Locale } }) {
+export default function LoginPage() {
   const router = useRouter();
+  const params = useParams<{ locale?: string }>();
+  const searchParams = useSearchParams();
   const { login, loading, error } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
-  const locale = params.locale;
+  const locale = isSupportedLocale(params?.locale) ? params.locale : defaultLocale;
+  const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
+  const googleAuthError = searchParams.get("googleAuthError");
+  const googleAuthHref = `/api/auth/google/start?${new URLSearchParams({
+    locale,
+    next: addLocaleToPath("/", locale),
+    failureRedirect: addLocaleToPath("/login", locale),
+  }).toString()}`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +61,38 @@ export default function LoginPage({ params }: { params: { locale: Locale } }) {
           </p>
         </div>
         <form className="mt-8 space-y-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 border border-pink-200" onSubmit={handleSubmit}>
-          {(formError || error) && (
+          {(formError || error || googleAuthError) && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg animate-fadeIn">
-              {formError || error?.message || t(locale, "common", "loginFailed")}
+              {formError ||
+                error?.message ||
+                (googleAuthError ? t(locale, "common", "googleAuthFailed") : null) ||
+                t(locale, "common", "loginFailed")}
             </div>
+          )}
+
+          {googleEnabled && (
+            <>
+              <a
+                href={googleAuthHref}
+                className="flex w-full items-center justify-center gap-3 rounded-lg border border-stone-300 bg-white px-4 py-3 text-sm font-medium text-stone-700 transition-all duration-300 hover:border-stone-400 hover:bg-stone-50"
+              >
+                <span className="text-base" aria-hidden="true">
+                  G
+                </span>
+                {t(locale, "common", "continueWithGoogle")}
+              </a>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-pink-200" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-3 text-stone-500">
+                    {t(locale, "common", "orContinueWithEmail")}
+                  </span>
+                </div>
+              </div>
+            </>
           )}
 
           <div className="space-y-4">

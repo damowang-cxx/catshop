@@ -100,7 +100,7 @@ CatShop 是一个基于 Next.js App Router 的电商项目，包含：
                       |
                       v
                自研后端 API
-               http://localhost:3001/api
+               http://127.0.0.1:3001/api
 ```
 
 ### 5.2 两条最典型的调用链
@@ -192,3 +192,4 @@ CatShop 是一个基于 Next.js App Router 的电商项目，包含：
 - 功能开关：`FEATURES_GUIDE.md`
 - 图片规范：`LOCAL_IMAGES_GUIDE.md`
 - 项目入口：`README.md`
+

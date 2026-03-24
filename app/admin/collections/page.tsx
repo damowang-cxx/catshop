@@ -47,7 +47,7 @@ async function getCollections(params: {
   status: string;
 }): Promise<PaginatedResponse<Collection>> {
   try {
-    const payload = await adminApiClient.get<unknown>("/collections", {
+    const payload = await adminApiClient.get<unknown>("/admin/collections", {
       page: params.page,
       pageSize: params.pageSize,
       q: params.q || undefined,
@@ -105,3 +105,4 @@ export default async function CollectionsPage({
     </div>
   );
 }
+

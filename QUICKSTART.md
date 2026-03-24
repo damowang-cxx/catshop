@@ -28,9 +28,10 @@ pnpm install
 
 ```bash
 COMMERCE_PROVIDER=custom
-CUSTOM_API_BASE_URL=http://localhost:3001/api
-NEXT_PUBLIC_CUSTOM_API_BASE_URL=http://localhost:3001/api
+CUSTOM_API_BASE_URL=http://127.0.0.1:3001/api
+NEXT_PUBLIC_CUSTOM_API_BASE_URL=http://127.0.0.1:3001/api
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=false
 SITE_NAME=CatShop
 ```
 
@@ -57,6 +58,24 @@ SITE_NAME=CatShop
 
 推荐方式：在 `E:\reveone2\shop` 根目录统一启动前后端。
 
+第一次启动后端前，先在 `catshop-api` 目录初始化数据库：
+
+```bash
+cd ../catshop-api
+docker compose up -d postgres redis minio clickhouse meilisearch mailpit
+pnpm install
+pnpm prisma:generate
+pnpm prisma:migrate:dev --name init_persistence
+pnpm seed
+```
+
+开发环境默认账号：
+
+- 后台管理员：`admin@example.com / admin123`
+- 前台用户：`alice@example.com / password123`
+
+完成后回到父目录统一启动：
+
 ```bash
 cd ..
 pnpm dev
@@ -77,6 +96,12 @@ pnpm dev:api
 ```
 
 打开 `http://localhost:3000`。
+
+如需启用 Google 登录/注册：
+
+- 前端 `.env.local` 设置 `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true`
+- 后端 `.env` 设置 `GOOGLE_AUTH_ENABLED=true`、`GOOGLE_CLIENT_ID`、`GOOGLE_CLIENT_SECRET`
+- Google OAuth 控制台回调地址配置为 `http://localhost:3000/api/auth/google/callback`
 
 ## 5. 构建与生产运行
 
@@ -104,3 +129,4 @@ pnpm start
 - API 对接：`API_INTEGRATION.md`
 - 功能开关：`FEATURES_GUIDE.md`
 - 本地图资源：`LOCAL_IMAGES_GUIDE.md`
+

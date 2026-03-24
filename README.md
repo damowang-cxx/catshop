@@ -18,8 +18,8 @@ pnpm install
 pnpm dev
 ```
 
-默认使用 `custom` Provider，并连接 `http://localhost:3001/api` 的自研后端。
-统一启动后，前端运行在 `http://localhost:3000`，后端运行在 `http://localhost:3001`。
+默认使用 `custom` Provider，并连接 `http://127.0.0.1:3001/api` 的自研后端。
+统一启动后，前端运行在 `http://localhost:3000`，后端运行在 `http://127.0.0.1:3001`。
 
 ## 文档导航
 
@@ -52,3 +52,4 @@ pnpm test     # 当前为 prettier 检查
 - 也可以在 `E:\reveone2\shop` 根目录运行 `pnpm dev:web` 或 `pnpm dev:api` 单独启动某一侧。
 - 当前仓库默认按“前端 + 自研后端”联调模式运行。
 - 若需要调整后端地址或切回其他 Provider，请先修改 `.env.local`，详见 [QUICKSTART.md](./QUICKSTART.md)。
+

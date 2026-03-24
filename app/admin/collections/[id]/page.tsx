@@ -32,7 +32,7 @@ export default async function EditCollectionPage({
   try {
     const payload = await adminApiClient.get<
       BackendCollection | { data: BackendCollection }
-    >(`/collections/${id}`);
+    >(`/admin/collections/${id}`);
     const collection =
       payload && typeof payload === "object" && "data" in payload
         ? payload.data
@@ -70,4 +70,5 @@ export default async function EditCollectionPage({
     );
   }
 }
+
 

@@ -1,15 +1,14 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { TAGS } from "lib/constants";
 import {
   addToCart,
-  createCart,
   getCart,
   removeFromCart,
   updateCart,
 } from "lib/commerce";
 import { updateTag } from "next/cache";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { CartItem } from "lib/types";
 
@@ -97,11 +96,11 @@ export async function updateItemQuantity(
 }
 
 export async function redirectToCheckout() {
+  const cookieStore = await cookies();
+  if (!cookieStore.get("auth_token")?.value) {
+    redirect("/login");
+  }
+
   let cart = await getCart();
   redirect(cart!.checkoutUrl);
-}
-
-export async function createCartAndSetCookie() {
-  let cart = await createCart();
-  (await cookies()).set("cartId", cart.id!);
 }

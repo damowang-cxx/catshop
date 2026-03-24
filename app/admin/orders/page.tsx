@@ -48,7 +48,7 @@ async function getOrders(params: {
   status: string;
 }): Promise<PaginatedResponse<Order>> {
   try {
-    const payload = await adminApiClient.get<unknown>("/orders", {
+    const payload = await adminApiClient.get<unknown>("/admin/orders", {
       page: params.page,
       pageSize: params.pageSize,
       q: params.q || undefined,
@@ -106,3 +106,4 @@ export default async function OrdersPage({
     </div>
   );
 }
+

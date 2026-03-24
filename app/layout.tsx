@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { FeaturesProvider } from "components/features/features-provider";
-import Navbar from "components/layout/navbar";
-import Footer from "components/layout/footer";
-import { defaultLocale } from "lib/i18n/config";
 import { getCommerceFeatures } from "lib/commerce";
 
 export const metadata: Metadata = {
@@ -37,14 +34,10 @@ export default function RootLayout({
   const features = getCommerceFeatures();
 
   return (
-    <html lang="zh-CN" className={GeistSans.className}>
+    <html lang="zh-CN" className={GeistSans.className} suppressHydrationWarning>
       <body className="bg-gradient-to-br from-pink-50 via-amber-50 to-rose-50 text-black antialiased">
         <FeaturesProvider features={features}>
-          <Navbar locale={defaultLocale} />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer locale={defaultLocale} />
+          {children}
         </FeaturesProvider>
       </body>
     </html>

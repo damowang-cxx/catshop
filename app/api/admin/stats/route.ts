@@ -1,12 +1,12 @@
-/**
- * 统计数据 API 路由
- * GET: 获取仪表盘统计数据
+﻿/**
+ * 缁熻鏁版嵁 API 璺敱
+ * GET: 鑾峰彇浠〃鐩樼粺璁℃暟鎹?
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-const backendUrl = process.env.CUSTOM_API_BASE_URL || "http://localhost:3001/api";
+const backendUrl = process.env.CUSTOM_API_BASE_URL || "http://127.0.0.1:3001/api";
 
 async function getAuthHeaders() {
   const cookieStore = await cookies();
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(data, { status: 200 });
     }
 
-    // 如果后端不可用，返回默认数据
+    // 濡傛灉鍚庣涓嶅彲鐢紝杩斿洖榛樿鏁版嵁
     return NextResponse.json({
       totalProducts: 0,
       totalOrders: 0,
@@ -40,8 +40,8 @@ export async function GET(request: NextRequest) {
       popularProducts: [],
     });
   } catch (error: any) {
-    console.error("获取统计数据失败:", error);
-    // 返回默认数据
+    console.error("鑾峰彇缁熻鏁版嵁澶辫触:", error);
+    // 杩斿洖榛樿鏁版嵁
     return NextResponse.json({
       totalProducts: 0,
       totalOrders: 0,
@@ -52,3 +52,4 @@ export async function GET(request: NextRequest) {
     });
   }
 }
+

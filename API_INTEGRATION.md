@@ -11,7 +11,7 @@
 - API Route 代理层 -> `app/api/*`
 - 自研后端或 Shopify -> 最终数据源
 
-当前仓库默认运行在 `custom` Provider 模式，目标后端地址为 `http://localhost:3001/api`。
+当前仓库默认运行在 `custom` Provider 模式，目标后端地址为 `http://127.0.0.1:3001/api`。
 如果你同时启动了相邻目录的 `catshop-api`，前端会直接进入联调模式。
 
 ## 2. API 客户端分层
@@ -75,3 +75,4 @@
 3. 在 `lib/providers/custom` 或后台模块中接入
 4. 必要时补充 `transformers` 映射
 5. 加入页面或 hooks 并补全错误反馈
+

@@ -44,6 +44,9 @@
     "passwordTooShort": "Password must be at least 6 characters",
     "passwordsNotMatch": "Passwords do not match",
     "emailRequired": "Email is required",
-    "passwordRequired": "Password is required"
+    "passwordRequired": "Password is required",
+    "continueWithGoogle": "Continue with Google",
+    "orContinueWithEmail": "Or continue with email",
+    "googleAuthFailed": "Google sign-in failed. Please try again."
   }
 }

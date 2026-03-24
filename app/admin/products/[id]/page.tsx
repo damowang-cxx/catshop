@@ -98,7 +98,7 @@ export default async function EditProductPage({
 
   try {
     const payload = await adminApiClient.get<BackendProduct | { data: BackendProduct }>(
-      `/products/${id}`
+      `/admin/products/${id}`
     );
     const product =
       payload && typeof payload === "object" && "data" in payload
@@ -130,4 +130,5 @@ export default async function EditProductPage({
     );
   }
 }
+
 

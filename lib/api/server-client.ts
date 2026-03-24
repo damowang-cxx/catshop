@@ -1,4 +1,4 @@
-import "server-only";
+﻿import "server-only";
 
 import { cookies } from "next/headers";
 
@@ -18,7 +18,7 @@ class ApiClient {
 
   constructor() {
     this.baseURL =
-      process.env.CUSTOM_API_BASE_URL || "http://localhost:3001/api";
+      process.env.CUSTOM_API_BASE_URL || "http://127.0.0.1:3001/api";
   }
 
   private async getAuthToken(): Promise<string | null> {
@@ -166,3 +166,4 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+

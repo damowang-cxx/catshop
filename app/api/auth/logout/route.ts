@@ -1,5 +1,5 @@
-/**
- * 用户登出 API 路由
+﻿/**
+ * 鐢ㄦ埛鐧诲嚭 API 璺敱
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -7,9 +7,9 @@ import { cookies } from "next/headers";
 
 export async function POST(request: NextRequest) {
   try {
-    const backendUrl = process.env.CUSTOM_API_BASE_URL || "http://localhost:3001/api";
+    const backendUrl = process.env.CUSTOM_API_BASE_URL || "http://127.0.0.1:3001/api";
     
-    // 尝试调用后端 API 登出
+    // 灏濊瘯璋冪敤鍚庣 API 鐧诲嚭
     try {
       const cookieStore = await cookies();
       const token = cookieStore.get("auth_token")?.value;
@@ -22,24 +22,25 @@ export async function POST(request: NextRequest) {
             Authorization: `Bearer ${token}`,
           },
         }).catch(() => {
-          // 忽略后端错误，继续清除本地 cookie
+          // 蹇界暐鍚庣閿欒锛岀户缁竻闄ゆ湰鍦?cookie
         });
       }
     } catch (error) {
-      // 忽略后端错误，继续清除本地 cookie
-      console.error("后端登出 API 调用失败:", error);
+      // 蹇界暐鍚庣閿欒锛岀户缁竻闄ゆ湰鍦?cookie
+      console.error("鍚庣鐧诲嚭 API 璋冪敤澶辫触:", error);
     }
 
-    // 清除本地 cookie
+    // 娓呴櫎鏈湴 cookie
     const cookieStore = await cookies();
     cookieStore.delete("auth_token");
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: any) {
-    console.error("登出错误:", error);
-    // 即使出错也清除 cookie
+    console.error("鐧诲嚭閿欒:", error);
+    // 鍗充娇鍑洪敊涔熸竻闄?cookie
     const cookieStore = await cookies();
     cookieStore.delete("auth_token");
     return NextResponse.json({ success: true }, { status: 200 });
   }
 }
+

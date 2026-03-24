@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
-import "../globals.css";
-import { FeaturesProvider } from "components/features/features-provider";
 import Navbar from "components/layout/navbar";
 import Footer from "components/layout/footer";
-import { locales, defaultLocale, type Locale } from "lib/i18n/config";
-import { getCommerceFeatures } from "lib/commerce";
+import HtmlLangUpdater from "components/layout/html-lang-updater";
+import { locales, type Locale } from "lib/i18n/config";
 import { notFound } from "next/navigation";
 import { use } from "react";
 
@@ -47,23 +44,17 @@ export default function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = use(params);
-  const features = getCommerceFeatures();
-  
+
   if (!locales.includes(locale as Locale)) {
     notFound();
   }
 
   return (
-    <html lang={localeNames[locale as Locale]} className={GeistSans.className}>
-      <body className="bg-gradient-to-br from-pink-50 via-amber-50 to-rose-50 text-black antialiased">
-        <FeaturesProvider features={features}>
-          <Navbar locale={locale as Locale} />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer locale={locale as Locale} />
-        </FeaturesProvider>
-      </body>
-    </html>
+    <>
+      <HtmlLangUpdater lang={localeNames[locale as Locale]} />
+      <Navbar locale={locale as Locale} />
+      <main className="min-h-screen">{children}</main>
+      <Footer locale={locale as Locale} />
+    </>
   );
 }

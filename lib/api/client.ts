@@ -1,63 +1,41 @@
-// Browser-only API client for client components and hooks.
+// Browser-only API client. Client components should only call Next.js BFF routes.
 export class ClientApiClient {
-  private baseURL: string;
-
-  constructor() {
-    this.baseURL =
-      process.env.NEXT_PUBLIC_CUSTOM_API_BASE_URL ||
-      process.env.CUSTOM_API_BASE_URL ||
-      "http://localhost:3001/api";
-  }
-
-  private getAuthToken(): string | null {
-    if (typeof document === "undefined") {
-      return null;
-    }
-
-    const cookies = document.cookie.split("; ");
-    const tokenCookie = cookies.find((cookie) =>
-      cookie.startsWith("auth_token=")
-    );
-
-    if (!tokenCookie) {
-      return null;
-    }
-
-    const [, token] = tokenCookie.split("=");
-    return token || null;
-  }
+  private readonly baseURL = "/api";
 
   private buildHeaders(customHeaders?: HeadersInit): HeadersInit {
-    const token = this.getAuthToken();
     const headers = new Headers(customHeaders);
     headers.set("Content-Type", "application/json");
-
-    if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
-    }
-
     return headers;
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
+    const contentType = response.headers.get("content-type") || "";
+
     if (!response.ok) {
       let errorMessage = `API Error: ${response.statusText}`;
-      const contentType = response.headers.get("content-type");
 
-      if (contentType?.includes("application/json")) {
+      if (contentType.includes("application/json")) {
         try {
           const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
+          errorMessage = errorData.error || errorData.message || errorMessage;
         } catch {
           // Ignore malformed error payloads.
         }
       }
 
-      throw new Error(errorMessage);
+      const error = new Error(errorMessage) as Error & { status?: number };
+      error.status = response.status;
+      throw error;
     }
 
-    const contentType = response.headers.get("content-type");
-    if (contentType?.includes("application/json")) {
+    if (
+      response.status === 204 ||
+      response.headers.get("content-length") === "0"
+    ) {
+      return undefined as T;
+    }
+
+    if (contentType.includes("application/json")) {
       const data = await response.json();
       if (data && typeof data === "object" && "data" in data) {
         return data.data as T;
@@ -68,23 +46,32 @@ export class ClientApiClient {
     return (await response.text()) as T;
   }
 
-  async get<T>(
+  private buildUrl(
     endpoint: string,
     params?: Record<string, string | number | boolean | undefined>
-  ): Promise<T> {
-    const url = new URL(`${this.baseURL}${endpoint}`);
+  ): string {
+    const searchParams = new URLSearchParams();
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          url.searchParams.append(key, String(value));
+          searchParams.append(key, String(value));
         }
       });
     }
 
-    const response = await fetch(url.toString(), {
+    const query = searchParams.toString();
+    return `${this.baseURL}${endpoint}${query ? `?${query}` : ""}`;
+  }
+
+  async get<T>(
+    endpoint: string,
+    params?: Record<string, string | number | boolean | undefined>
+  ): Promise<T> {
+    const response = await fetch(this.buildUrl(endpoint, params), {
       method: "GET",
       headers: this.buildHeaders(),
+      credentials: "same-origin",
     });
 
     return this.handleResponse<T>(response);
@@ -94,6 +81,7 @@ export class ClientApiClient {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: "POST",
       headers: this.buildHeaders(),
+      credentials: "same-origin",
       body: data ? JSON.stringify(data) : undefined,
     });
 
@@ -104,6 +92,7 @@ export class ClientApiClient {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: "PATCH",
       headers: this.buildHeaders(),
+      credentials: "same-origin",
       body: data ? JSON.stringify(data) : undefined,
     });
 
@@ -114,6 +103,7 @@ export class ClientApiClient {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: "DELETE",
       headers: this.buildHeaders(),
+      credentials: "same-origin",
       body: data ? JSON.stringify(data) : undefined,
     });
 
