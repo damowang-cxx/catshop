@@ -129,6 +129,7 @@ pnpm start
 - API 对接：`API_INTEGRATION.md`
 - 功能开关：`FEATURES_GUIDE.md`
 - 本地图资源：`LOCAL_IMAGES_GUIDE.md`
+- Ubuntu 生产模板：`DEPLOY_UBUNTU.md`
 
 ## 9. Ubuntu 服务器部署验证（推荐流程）
 

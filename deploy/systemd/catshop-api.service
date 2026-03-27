@@ -1,0 +1,22 @@
+[Unit]
+Description=CatShop API (NestJS)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/project/shop/catshop-api
+EnvironmentFile=/etc/catshop/catshop-api.env
+ExecStart=/usr/bin/env node dist/main
+Restart=always
+RestartSec=3
+KillSignal=SIGINT
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+SyslogIdentifier=catshop-api
+
+[Install]
+WantedBy=multi-user.target
